@@ -1,0 +1,133 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:beans="http://www.springframework.org/schema/beans" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security-3.2.xsd
+http://www.springframework.org/schema/security/oauth2
+http://www.springframework.org/schema/security/spring-security-oauth2-1.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+                                     <!-- Explains the implementation for OAuth 2.0 Authorization Server -->
+
+    <!-- authorization-server defines all the attributes needed for token management-->
+
+
+    <!-- PART :1 Authorization Service -->
+    <oauth:authorization-server client-details-service-ref="clientDetails" token-services-ref="tokenServices">
+
+        <oauth:authorization-code />
+        <!--  a way for clients to obtain an access token by obtaining an authorization code. -->
+        <oauth:implicit />
+        <!-- client credentials grant type -->
+        <oauth:refresh-token />
+        <oauth:client-credentials />
+        <oauth:password authentication-manager-ref="userAuthenticationManager"/>
+    </oauth:authorization-server>
+
+
+    <security:http auto-config="true" use-expressions="true" pattern="/oauth/token" create-session="stateless"
+          authentication-manager-ref="authenticationManager">
+        <security:intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
+        <security:anonymous enabled="false"/>
+        <security:http-basic entry-point-ref="clientAuthenticationEntryPoint"/>
+        <security:custom-filter ref="clientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER"/>
+    </security:http>
+
+
+
+    <sec:http pattern="/protected/**" create-session="never"
+              entry-point-ref="oauthAuthenticationEntryPoint">
+        <sec:anonymous enabled="false" />
+        <sec:intercept-url pattern="/protected/**" method="GET" access="IS_AUTHENTICATED_FULLY" />
+        <sec:custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+        <sec:access-denied-handler ref="oauthAccessDeniedHandler" />
+    </sec:http>
+
+
+    <bean id="oauthAccessDeniedHandler"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler">
+    </bean>
+
+
+
+    <!-- Client Authentication: When the call to a particular resource for a user fails -->
+    <bean id="clientAuthenticationEntryPoint"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+        <property name="realmName" value="springsec/client" />
+        <property name="typeName" value="Basic" />
+    </bean>
+
+
+    <bean id="clientCredentialsTokenEndpointFilter"
+          class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+    </bean>
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="clientDetailsUserService"/>
+    </security:authentication-manager>
+
+    <bean id="clientDetailsUserService"
+          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="clientDetails"/>
+    </bean>
+
+
+    <!-- Class with the real Implementation for the Clients services -->
+
+    <bean id="clientDetails" class="com.oauth2.service.ClientDetailsServiceImpl">
+
+        <property name="user_id" value="user_id" />
+        <property name="secret_key" value="secret_key" />
+
+            </bean>
+
+
+
+    <sec:authentication-manager alias="userAuthenticationManager">
+        <sec:authentication-provider ref="customUserAuthenticationProvider" />
+    </sec:authentication-manager>
+
+    <bean id="customUserAuthenticationProvider"
+          class="com.oauth2.service.CustomUserAuthenticationProvider">
+    </bean>
+
+    <context:annotation-config/>
+
+    <!-- PART :1 RESOURCE Service -->
+
+
+    <oauth:resource-server id="resourceServerFilter"
+                           resource-id="springsec" token-services-ref="tokenServices" />
+
+    <beans:bean id="tokenStore"
+          class="org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore" />
+
+
+    <bean id="tokenServices"
+          class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="tokenStore" />
+        <property name="supportRefreshToken" value="true" />
+        <property name="accessTokenValiditySeconds" value="120"></property>
+        <property name="clientDetailsService" ref="clientDetails" />
+    </bean>
+
+<!--    <mvc:annotation-driven />
+
+    <mvc:default-servlet-handler />
+
+    <context:annotation-config/>-->
+
+
+
+
+
+
+    </beans>
