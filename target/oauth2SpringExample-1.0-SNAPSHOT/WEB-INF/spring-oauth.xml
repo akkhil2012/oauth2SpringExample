@@ -34,7 +34,7 @@ http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
     <security:http auto-config="true" use-expressions="true" pattern="/oauth/token" create-session="stateless"
           authentication-manager-ref="authenticationManager">
-        <security:intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"/>
+        <security:intercept-url pattern="/oauth/token" access="isFullyAuthenticated()"/>
         <security:anonymous enabled="false"/>
         <security:http-basic entry-point-ref="clientAuthenticationEntryPoint"/>
         <security:custom-filter ref="clientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER"/>
@@ -49,6 +49,11 @@ http://www.springframework.org/schema/context/spring-context-3.1.xsd">
         <sec:custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
         <sec:access-denied-handler ref="oauthAccessDeniedHandler" />
     </sec:http>
+
+
+    <bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+        <property name="realmName" value="test" />
+    </bean>
 
 
     <bean id="oauthAccessDeniedHandler"

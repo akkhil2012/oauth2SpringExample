@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by akhilg on 5/30/2014.
@@ -18,10 +19,16 @@ public class ClientDetailsServiceImpl implements ClientDetailsService{
     private String user_id;
     private String secret_key;
 
+    Logger logg = Logger.getLogger("ClientDetailsServiceImpl.class");
+
+
     public ClientDetails loadClientByClientId(String clientId){
+
+        logg.info("Inside Clients Details method........................");
 
         if (clientId.equals(user_id))
         {
+            logg.info("Inside if clause in Clients Dteails.......................");
             List<String> authorizedGrantTypes = new ArrayList<String>();
             authorizedGrantTypes.add("password");
             authorizedGrantTypes.add("refresh_token");
@@ -35,6 +42,7 @@ public class ClientDetailsServiceImpl implements ClientDetailsService{
             return clientDetails;
         }
         else {
+            logg.info("Inside else clause in cleints details");
             throw new NoSuchClientException("No client recognized with id: "
                     + clientId);
         }
