@@ -8,14 +8,15 @@ import facebook4j.internal.logging.Logger;
 /**
  * Created by akhilg on 6/2/2014.
  */
-public class FacebookService {
+public  class FacebookService {
 
-  //  final Facebook facebook = new FacebookFactory().getInstance();
+   final Facebook facebook = new FacebookFactory().getInstance();
     String message="";
 
     Logger logg = Logger.getLogger(FacebookService.class);
 
-  PostUpdate postUpdate = new PostUpdate("");
+    PostUpdate postUpdate = new PostUpdate("");
+
 
 
     public void postMessage(String msg){
@@ -24,11 +25,19 @@ public class FacebookService {
     //    final Facebook facebook = new FacebookFactory().getInstance();
       //  facebook.setOAuthAppId();
         try {
-            new FacebookFactory().getInstance().postStatusMessage("test status");
+           Facebook facebook =  new FacebookFactory().getInstance();
         }catch (Exception e) {
 
         }
         PrivacyParameter privacy = new PrivacyBuilder().setValue(PrivacyType.ALL_FRIENDS).build();
+
+        try {
+            facebook.postStatusMessage("testStatus............");
+        }catch (Exception e){
+
+        }
+       // postMethods.postStatusMessage("");
+
 
 
         postUpdate.setPublished(Boolean.TRUE);
@@ -39,6 +48,8 @@ public class FacebookService {
         postUpdate.setMessage(msg);
 
         postUpdate.getPublished();
+
+        logg.info("After post pukblished.....");
 
 
       //  PostMethods postMethods =  new FacebookFactory().getInstance();

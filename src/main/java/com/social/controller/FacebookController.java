@@ -22,7 +22,8 @@ import java.util.logging.Logger;
 @Controller
 public class FacebookController {
 
-    private static final String SCOPE = "email,offline_access,user_about_me,user_birthday,read_friendlists";
+    //private static final String SCOPE = "email,offline_access,user_about_me,user_birthday,read_friendlists,publish_actions,user_status";
+    private static final String SCOPE = "user_status";
     private static final String REDIRECT_URI = "http://sampleapp.com:8080/oauth2SpringExample-1.0-SNAPSHOT/social/facebook/FacebookCallback";
     private static final String CLIENT_ID = "667686176613908";
     private static final String APP_SECRET = "667686176613908|XbiKIkrfjjZkRjh8G2Nvd4Z3K8k";
@@ -102,7 +103,7 @@ public class FacebookController {
 
 
 
-            facebookService.postMessage("postText");
+            facebookService.postMessage("?????????????????????????????");
 
             logg.info("Inside Post Message to FB method......After Posting to FB....");
 
